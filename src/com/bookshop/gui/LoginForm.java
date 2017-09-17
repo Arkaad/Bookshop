@@ -1,21 +1,26 @@
 package com.bookshop.gui;
 
-import com.bookshop.common.ViewConstants;
 import com.bookshop.common.GUIUtility;
+import com.bookshop.common.Validation;
+import com.bookshop.common.ValidationSignals;
+import com.bookshop.common.ViewConstants;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class LoginForm {
+public class LoginForm extends JFrame{
 
-    private static void placeComponents(JPanel panel) {
+    private static final String iconPath = "images/logo.png";
+    private JTextField userIdTxt;
+    private JPasswordField passwordField;
+
+    private void placeComponents(JPanel panel) {
         panel.setLayout(null);
 
         //ImageLabel
-        JLabel imageLabel = new JLabel(new ImageIcon("images/logo.png"));
+        JLabel imageLabel = new JLabel(new ImageIcon(iconPath));
         imageLabel.setBounds(130, 10, 204, 190);
         panel.add(imageLabel);
 
@@ -34,7 +39,7 @@ public class LoginForm {
         panel.add(userIdLabel);
 
         //UserIdTextField
-        JTextField userIdTxt = new JTextField();
+        userIdTxt = new JTextField();
         userIdTxt.setBounds(110, 280, 270, 30);
         userIdTxt.setToolTipText("Enter your UserId/EmailId");
         panel.add(userIdTxt);
@@ -47,7 +52,7 @@ public class LoginForm {
         panel.add(passwordLabel);
 
         //PasswordField
-        JPasswordField passwordField = new JPasswordField();
+        passwordField = new JPasswordField();
         passwordField.setBounds(110, 330, 270, 30);
         panel.add(passwordField);
 
@@ -66,11 +71,25 @@ public class LoginForm {
         cancelButton.setBounds(260, 390, 90, 30);
         panel.add(cancelButton);
         cancelButton.addActionListener(e -> System.exit(0));
+
+        SwingUtilities.getRootPane(loginButton).setDefaultButton(loginButton);
     }
 
-    private static void validateCredentials()
+    private void validateCredentials()
     {
-
+        String userId = userIdTxt.getText();
+        String password = String.valueOf(passwordField.getPassword());
+        System.out.println("userId = " + userId + " password = " + password);
+        if(userId.equals(""))
+        {
+            JOptionPane.showMessageDialog(null," Please Enter your User ID ","User ID missing",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(password.equals(""))
+        {
+            JOptionPane.showMessageDialog(null," Please Enter your Password ","Password missing",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
     }
 
     public void errorDialog(String message) {
@@ -79,6 +98,7 @@ public class LoginForm {
             dialog.setTitle("Error");
             dialog.setModal(true);
             dialog.setAlwaysOnTop(true);
+            dialog.setIconImage(new ImageIcon(iconPath).getImage());
             JTextArea jTextArea = new JTextArea(message);
             jTextArea.setMargin(new Insets(5, 5, 5, 5));
             jTextArea.setTabSize(4);
@@ -104,17 +124,29 @@ public class LoginForm {
         System.exit(0);
     }
 
+    private static String validateSystemCredentials()
+    {
+        try {
+            if (!Validation.isValidJavaVersion()) {
+                return ValidationSignals.JAVA_VERSION.name();
+            }
+            return ValidationSignals.OK.name();
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
     public static void main(String[] args) {
         JFrame frame = new JFrame("Login");
-        frame.setIconImage(new ImageIcon("images/logo.png").getImage());
+        frame.setIconImage(new ImageIcon(iconPath).getImage());
         frame.setSize(468, 489);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         GUIUtility.center(frame);
 
         JPanel panel = new JPanel();
         frame.add(panel);
-        placeComponents(panel);
-
+        new LoginForm().placeComponents(panel);
         frame.setVisible(true);
     }
 }
